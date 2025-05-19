@@ -10,7 +10,7 @@ import Marketplace from './components/Marketplace';
 import VoiceAssistant from './components/VoiceAssistant';
 import Weather from './components/Weather/Weather';
 import './App.css';
-import CropPrices from './components/cropprices';
+import CropPrices from './components/CropPrices/CropPrices';
 function App() {
   return (
     <Router>
