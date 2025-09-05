@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
+
 
 const VoiceAssistant = ({ handleCommand }) => {
   const [listening, setListening] = useState(false);
@@ -6,13 +7,13 @@ const VoiceAssistant = ({ handleCommand }) => {
   const [assistantReply, setAssistantReply] = useState('నాకు వినిపించడం లేదు');
   const recognitionRef = useRef(null);
 
-  // Speak text in Telugu
+  // Function to speak the response in Telugu
   const speak = (text, callback = null) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'te-IN';
     window.speechSynthesis.cancel();
     utterance.onend = () => {
-      if (callback) callback(); // Callback to restart recognition
+      if (callback) callback(); // restart recognition after speaking
     };
     window.speechSynthesis.speak(utterance);
   };
@@ -29,7 +30,7 @@ const VoiceAssistant = ({ handleCommand }) => {
     const recognition = new SpeechRecognition();
     recognition.lang = 'te-IN';
     recognition.interimResults = false;
-    recognition.continuous = false; // We'll control restarting manually
+    recognition.continuous = false;
 
     recognition.onstart = () => {
       setListening(true);
@@ -38,18 +39,34 @@ const VoiceAssistant = ({ handleCommand }) => {
       speak(msg);
     };
 
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
       const transcript = event.results[0][0].transcript.trim();
       setUserSpeech(transcript);
-
-      const reply = getHardcodedReply(transcript);
+      let reply = 'సమాధానం పొందుతున్నాను...';
       setAssistantReply(reply);
+      speak(reply);
 
-      // Speak and then restart recognition (conversation loop)
+      try {
+      const response = await fetch('http://localhost:5000/api/openai', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    prompt: transcript,
+  }),
+});
+
+        const data = await response.json();
+        reply = data.choices?.[0]?.message?.content || 'సమాధానం అందుబాటులో లేదు.';
+      } catch (error) {
+        reply = 'క్షమించండి, సర్వర్ నుండి సమాధానం రాలేదు.';
+        console.error('OpenAI error:', error);
+      }
+
+      setAssistantReply(reply);
       speak(reply, () => {
-        if (listening) {
-          recognition.start(); // Continue listening
-        }
+        if (listening) recognition.start();
       });
 
       if (handleCommand) {
@@ -58,7 +75,7 @@ const VoiceAssistant = ({ handleCommand }) => {
     };
 
     recognition.onerror = (event) => {
-      const msg = 'క్షమించండి, నాకు వినిపించలేదు. దయచేసి మరలా ప్రయత్నించండి.';
+      const msg = 'క్షమించండి, వినలేకపోయాను.';
       setAssistantReply(msg);
       speak(msg, () => {
         if (listening) recognition.start();
@@ -66,9 +83,7 @@ const VoiceAssistant = ({ handleCommand }) => {
     };
 
     recognition.onend = () => {
-      if (listening) {
-        recognition.start(); // Keep restarting unless manually stopped
-      }
+      if (listening) recognition.start();
     };
 
     recognitionRef.current = recognition;
@@ -94,26 +109,13 @@ const VoiceAssistant = ({ handleCommand }) => {
     }
   };
 
-  const getHardcodedReply = (input) => {
-    const cmd = input.toLowerCase();
-
-    if (cmd.includes('వాతావరణ') || cmd.includes('వాతావరణం')) {
-      return 'ఈ రోజు వాతావరణం తక్కువ గాలితో కూడి ఉంటుంది. మీరు వర్షం కోసం సిద్ధంగా ఉండండి.';
-    } else if (cmd.includes('పంట రేటు') || cmd.includes('క్రాప్ ప్రైస్')) {
-      return 'ఇప్పటి పంట రేటులు: బియ్యం ₹45, గోధుమలు ₹35.';
-    } else if (cmd.includes('హోమ్') || cmd.includes('ఇంటికి')) {
-      return 'మీరు ప్రధాన పేజీకి వెళ్తున్నారు.';
-    } else {
-      return 'క్షమించండి, నేను అర్థం చేసుకోలేకపోయాను.';
-    }
-  };
-
   return (
-    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-center space-y-2 w-64 p-3 rounded-lg bg-white shadow-xl">
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-center space-y-2 w-72 p-3 rounded-lg bg-white shadow-xl">
       <button
         onClick={toggleListening}
-        className={`w-14 h-14 rounded-full text-white text-xl shadow-md 
-          ${listening ? 'bg-red-600' : 'bg-green-600'}`}
+        className={`w-14 h-14 rounded-full text-white text-xl shadow-md ${
+          listening ? 'bg-red-600 animate-pulse-slow' : 'bg-green-600'
+        }`}
         title="మైక్ టోగిల్ చేయండి"
       >
         🎤
