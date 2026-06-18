@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 
-import LandingPage from './pages/Landingpage';
+import LandingPage from './pages/LandingPage';
 import FarmerDashboard from './components/Dashboard/FarmerDashboard';
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
