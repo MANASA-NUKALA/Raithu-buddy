@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import * as tf from "@tensorflow/tfjs";
+
+let tf = null;
 
 const DiseaseDetection = () => {
   const [model, setModel] = useState(null);
@@ -9,6 +10,10 @@ const DiseaseDetection = () => {
   // Load model
   const loadModel = async () => {
     try {
+      if (!tf) {
+        const tfModule = await import('@tensorflow/tfjs');
+        tf = tfModule;
+      }
       const loadedModel = await tf.loadGraphModel(
         "/models/plant_disease_tfjs/model.json"
       );

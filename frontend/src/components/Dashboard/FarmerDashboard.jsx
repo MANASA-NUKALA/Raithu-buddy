@@ -43,68 +43,38 @@ const FarmerDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Top Navigation Bar */}
-      <nav className="bg-green-700 text-white p-4 shadow-md">
-        <div className="container mx-auto flex items-center justify-between">
-          <motion.h1
-            className="text-2xl font-bold cursor-pointer"
-            onClick={() => setSelectedSection('weather')} // Go to default section on logo click
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 10 }}
-          >
-            🌾 RaithuBuddy
-          </motion.h1>
-          <div className="space-x-4">
-            {navItems.map((item) => (
-              <motion.button
-                key={item.value}
-                onClick={() => setSelectedSection(item.value)}
-                className={`hover:bg-green-600 text-white py-2 px-3 rounded focus:outline-none focus:ring-2 focus:ring-green-500 ${
-                  selectedSection === item.value ? 'bg-green-600' : ''
-                }`}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 10 }}
-              >
-                {item.name}
-              </motion.button>
-            ))}
-          </div>
+    <div className="min-h-screen">
+      <nav className="clean-card" style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'1rem 2rem'}}>
+        <motion.h1 className="site-title" onClick={() => setSelectedSection('weather')} whileHover={{ scale: 1.02 }}>
+          RaithuBuddy
+        </motion.h1>
+        <div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap'}}>
+          {navItems.map((item) => (
+            <motion.button
+              key={item.value}
+              onClick={() => setSelectedSection(item.value)}
+              className={`clean-btn ${selectedSection === item.value ? '' : ''}`}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 12 }}
+            >
+              {item.name}
+            </motion.button>
+          ))}
         </div>
       </nav>
 
-      {/* Main Content */}
-      <motion.main
-        className="container mx-auto p-6"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-      >
+      <motion.main className="container mx-auto p-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
         <header className="mb-6">
-          <motion.h2
-            className="text-3xl font-semibold text-gray-800 mb-2"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.3 }}
-          >
+          <motion.h2 className="text-3xl font-semibold text-gray-800 mb-2" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.3 }}>
             Welcome back, Farmer!
           </motion.h2>
-          <motion.p
-            className="text-gray-600"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
-          >
+          <motion.p className="text-gray-600" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.3 }}>
             Today: {new Date().toLocaleDateString()}
           </motion.p>
         </header>
-        <motion.div
-          className="bg-white p-8 rounded-2xl shadow-lg"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.2 }}
-        >
+
+        <motion.div className="clean-card" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2 }}>
           {renderContent()}
         </motion.div>
       </motion.main>
